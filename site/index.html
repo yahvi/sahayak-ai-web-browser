@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sahayak (सहायक) — AI Browser Side-Panel Agent</title>
+  <meta name="description" content="Chrome and Edge side-panel AI assistant that reads articles and YouTube videos, chats with page context, finds controls, and acts with your approval.">
+  <style>
+    :root {
+      --bg: #f6f3ee;
+      --bg-card: #fffdf9;
+      --ink: #1c1917;
+      --ink-muted: #64748b;
+      --line: #e2e8f0;
+      --accent: #0f766e;
+      --accent-light: #ccfbf1;
+      --accent-hover: #115e59;
+      --danger: #b91c1c;
+      --danger-light: #fee2e2;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      --radius: 12px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation */
+    header.site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(246, 243, 238, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      padding: 16px 24px;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand-group {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .brand-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+    .brand-native {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--accent);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .nav-links a {
+      color: var(--ink-muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: color 0.15s ease;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .btn-header {
+      background: var(--accent);
+      color: #fff !important;
+      padding: 8px 16px;
+      border-radius: 999px;
+      transition: background 0.15s ease !important;
+    }
+    .btn-header:hover { background: var(--accent-hover) !important; }
+
+    /* Hero Section */
+    .hero {
+      max-width: 1200px;
+      margin: 60px auto 40px;
+      padding: 0 24px;
+      text-align: center;
+    }
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-radius: 999px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(15, 118, 110, 0.2);
+    }
+    h1.hero-title {
+      font-size: 3.2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: var(--ink);
+      margin-bottom: 20px;
+    }
+    h1.hero-title span.highlight {
+      color: var(--accent);
+      background: linear-gradient(120deg, #0f766e, #14b8a6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--ink-muted);
+      max-width: 760px;
+      margin: 0 auto 36px;
+      line-height: 1.55;
+    }
+    .cta-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(15, 118, 110, 0.35);
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      padding: 14px 24px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    /* 30-Second Interactive Simulator */
+    .simulator-section {
+      max-width: 1040px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+    .sim-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .sim-header {
+      background: #f1f5f9;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+    .sim-browser-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot.red { background: #ef4444; }
+    .dot.yellow { background: #f59e0b; }
+    .dot.green { background: #10b981; }
+    .sim-url-bar {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 4px 14px;
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      width: 65%;
+      text-align: center;
+    }
+    .sim-body {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      min-height: 480px;
+    }
+    @media (max-width: 860px) {
+      .sim-body { grid-template-columns: 1fr; }
+    }
+
+    /* Simulator Left: Mock Page Content */
+    .sim-page {
+      padding: 24px;
+      background: #fafaf9;
+      border-right: 1px solid var(--line);
+    }
+    .sim-page h3 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+    }
+    .sim-page p {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      margin-bottom: 16px;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      font-size: 0.9rem;
+    }
+    .form-group.focused input {
+      border: 2px solid var(--accent);
+      outline: none;
+      background: #f0fdfa;
+    }
+    .badge-tag {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-right: 6px;
+    }
+    .badge-tag.danger {
+      background: var(--danger);
+    }
+
+    /* Simulator Right: Sahayak Panel */
+    .sim-panel {
+      display: flex;
+      flex-direction: column;
+      background: #fffdf9;
+    }
+    .panel-top {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f6f3ee;
+    }
+    .panel-top .brand {
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+    .sim-lang-toggle {
+      display: flex;
+      background: #e2e8f0;
+      border-radius: 999px;
+      padding: 2px;
+    }
+    .sim-lang-btn {
+      border: none;
+      background: transparent;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .sim-lang-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+    .sim-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--line);
+      background: #fcfbfa;
+    }
+    .sim-tab-btn {
+      flex: 1;
+      padding: 8px 6px;
+      border: none;
+      background: transparent;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      text-align: center;
+    }
+    .sim-tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: #fff;
+    }
+    .sim-content {
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* Proposal Box in Simulator */
+    .proposal-box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+      margin-bottom: 12px;
+    }
+    .proposal-box.consequential {
+      border: 1.5px solid var(--danger);
+      background: #fff5f5;
+    }
+    .proposal-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 0.78rem;
+    }
+    .proposal-step {
+      background: var(--accent);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .proposal-type {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .proposal-reason {
+      font-size: 0.82rem;
+      color: #475569;
+      margin: 8px 0;
+      line-height: 1.4;
+    }
+    .consequential-alert {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+    .sim-actions-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .sim-btn-approve {
+      flex: 1;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .sim-btn-approve.danger {
+      background: var(--danger);
+    }
+    .sim-btn-skip {
+      background: #f1f5f9;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    /* Features Grid */
+    .features-section {
+      max-width: 1200px;
+      margin: 80px auto;
+      padding: 0 24px;
+    }
+    .section-title {
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .section-subtitle {
+      text-align: center;
+      color: var(--ink-muted);
+      font-size: 1.1rem;
+      margin-bottom: 48px;
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 14px;
+      display: inline-block;
+    }
+    .feature-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .feature-card p {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      line-height: 1.55;
+    }
+
+    /* Screenshots Gallery */
+    .gallery-section {
+      max-width: 1200px;
+      margin: 80px auto;
+      padding: 0 24px;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 28px;
+    }
+    .gallery-item {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-bottom: 1px solid var(--line);
+    }
+    .gallery-caption {
+      padding: 16px 20px;
+    }
+    .gallery-caption h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .gallery-caption p {
+      font-size: 0.88rem;
+      color: var(--ink-muted);
+    }
+
+    /* Installation Guide */
+    .install-section {
+      background: #fff;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 80px 24px;
+      margin: 80px 0;
+    }
+    .install-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-top: 36px;
+    }
+    .step-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-body h4 {
+      font-size: 1.15rem;
+      margin-bottom: 6px;
+    }
+    .step-body p {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+    .code-block {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      overflow-x: auto;
+    }
+
+    /* Footer */
+    footer.site-footer {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      color: var(--ink-muted);
+      font-size: 0.9rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand-group">
+        <span class="brand-title">Sahayak</span>
+        <span class="brand-native">सहायक</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#simulator">Live Demo</a>
+        <a href="#features">Features</a>
+        <a href="#gallery">Screenshots</a>
+        <a href="#install">Install</a>
+        <a href="https://github.com/sahayak-ai/sahayak" class="btn-header" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="pill-badge">
+      <span>🛡️ Privacy-First Manifest V3 Agent</span>
+    </div>
+    <h1 class="hero-title">
+      The AI Browser Side-Panel that<br>
+      <span class="highlight">Reads, Sees, &amp; Acts With Your Approval</span>
+    </h1>
+    <p class="hero-subtitle">
+      Grounds article &amp; YouTube video summaries strictly in page context. Discovers interactive web elements and executes actions one step at a time — requiring your approval before every click or form submission.
+    </p>
+
+    <div class="cta-group">
+      <a href="#install" class="btn-primary">
+        <span>⚡ Quick Install Guide</span>
+      </a>
+      <a href="https://github.com/sahayak-ai/sahayak/releases" class="btn-secondary" target="_blank" rel="noopener">
+        <span>📦 Download Release ZIP (v0.1.0)</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- 30-Second Interactive Simulator -->
+  <section class="simulator-section" id="simulator">
+    <div class="sim-card">
+      <div class="sim-header">
+        <div class="sim-browser-dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <div class="sim-url-bar" id="sim-url">
+          http://127.0.0.1:3000/form.html (Practice Errand: Internship Application)
+        </div>
+        <span style="font-size: 0.75rem; font-weight: 700; color: #0f766e;">● Allowlisted Host</span>
+      </div>
+
+      <div class="sim-body">
+        <!-- Left: Simulated Web Page -->
+        <div class="sim-page">
+          <h3 id="sim-page-title">Campus Internship Application</h3>
+          <p id="sim-page-desc">Complete your application details below to apply for the summer AI research fellowship.</p>
+
+          <div class="form-group" id="sim-field-1">
+            <label><span class="badge-tag">1</span> Full Name</label>
+            <input type="text" id="sim-input-name" placeholder="Enter full name" value="">
+          </div>
+
+          <div class="form-group" id="sim-field-2">
+            <label><span class="badge-tag">2</span> Email Address</label>
+            <input type="email" id="sim-input-email" placeholder="student@university.edu" value="">
+          </div>
+
+          <div class="form-group" id="sim-field-3">
+            <label><span class="badge-tag">3</span> Project Track</label>
+            <select id="sim-input-track">
+              <option>Select specialization...</option>
+              <option selected>Full Stack AI Systems</option>
+              <option>Computer Vision &amp; Robotics</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="sim-field-4" style="margin-top: 24px;">
+            <label><span class="badge-tag danger">4</span> Consequential Submission</label>
+            <button type="button" id="sim-submit-btn" style="background: #0f766e; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 700; cursor: pointer;">
+              Submit Application
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Sahayak Side Panel -->
+        <div class="sim-panel">
+          <div class="panel-top">
+            <div class="brand">Sahayak <span style="font-weight: 400; color: #78716c;">सहायक</span></div>
+            <div class="sim-lang-toggle">
+              <button class="sim-lang-btn active" id="btn-lang-en" onclick="setSimLang('en')">EN</button>
+              <button class="sim-lang-btn" id="btn-lang-hi" onclick="setSimLang('hi')">HI</button>
+            </div>
+          </div>
+
+          <div class="sim-tabs">
+            <button class="sim-tab-btn" onclick="showSimTab('summary')">Summary</button>
+            <button class="sim-tab-btn" onclick="showSimTab('chat')">Chat</button>
+            <button class="sim-tab-btn active" id="tab-act-btn" onclick="showSimTab('act')">Act</button>
+            <button class="sim-tab-btn" onclick="showSimTab('settings')">Settings</button>
+          </div>
+
+          <div class="sim-content" id="sim-panel-content">
+            <!-- Simulated Step Content -->
+            <div id="sim-step-view">
+              <div class="proposal-box" id="sim-proposal-card">
+                <div class="proposal-header">
+                  <span class="proposal-step" id="sim-step-num">Step 1 of 4</span>
+                  <span class="proposal-type" id="sim-step-type">TYPE</span>
+                  <span style="font-size: 0.72rem; color: #64748b; margin-left: auto;">Goal: Apply with profile</span>
+                </div>
+                <div style="font-size: 0.88rem; font-weight: 700;" id="sim-step-target">
+                  Type "John Doe" on [1] input "Full Name"
+                </div>
+                <p class="proposal-reason" id="sim-step-reason">
+                  "Auto-populate applicant name using verified local profile memory."
+                </p>
+                <div id="sim-consequential-banner" style="display: none;" class="consequential-alert">
+                  ⚠️ <strong>Extra Confirmation Required:</strong> This looks like Submit, Pay, or Send. Confirm again to execute.
+                </div>
+                <div class="sim-actions-row">
+                  <button class="sim-btn-approve" id="sim-approve-btn" onclick="advanceSimStep()">
+                    ✓ Approve Step
+                  </button>
+                  <button class="sim-btn-skip" onclick="skipSimStep()">Skip</button>
+                </div>
+              </div>
+              <p style="font-size: 0.75rem; color: #64748b; text-align: center;">
+                🛡️ You retain control: Sahayak never clicks or types without approval.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features -->
+  <section class="features-section" id="features">
+    <h2 class="section-title">Engineered for Accuracy &amp; Safety</h2>
+    <p class="section-subtitle">
+      Every capability is purpose-built to eliminate hallucination, enforce strict privacy, and keep you in total control.
+    </p>
+
+    <div class="grid-3">
+      <div class="feature-card">
+        <span class="feature-icon">📄</span>
+        <h3>Grounded Article Summaries</h3>
+        <p>Uses Mozilla Readability to strip ads and sidebars, extracting clean article text. Gemini summarizes strictly from page text and explicitly tells you when information is absent.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🎬</span>
+        <h3>Native YouTube Understanding</h3>
+        <p>Direct integration with Gemini 2.5 Flash for public YouTube videos. Extracts key takeaways and interactive chapter timestamps — click any timestamp to seek the video tab.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🇮🇳</span>
+        <h3>Bilingual English &amp; Hinglish</h3>
+        <p>Instant one-click language toggle in the header. Explains complex technical documentation in natural Hinglish for effortless comprehension.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🛡️</span>
+        <h3>Denylist Primacy Security</h3>
+        <p>Banking, payments, checkouts, and medical portals are automatically classified as sensitive. Extraction, screen capture, and agent actions are completely blocked on sensitive pages.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <h3>Protected Field Barriers</h3>
+        <p>Password, OTP/TOTP, and Credit Card fields are strictly blocked in code. The agent is mathematically prevented from typing into any protected security field.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🤖</span>
+        <h3>Human-in-the-Loop Agent</h3>
+        <p>Proposes exactly one verified DOM action at a time with rationale. Consequential actions (Submit, Pay, Send) require double confirmation before DOM execution.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visual Walkthrough / Screenshots -->
+  <section class="gallery-section" id="gallery">
+    <h2 class="section-title">See Sahayak in Action</h2>
+    <p class="section-subtitle">Visual architecture of the extension side-panel across core everyday workflows.</p>
+
+    <div class="gallery-grid">
+      <div class="gallery-item">
+        <img src="screenshots/article-summary.svg" alt="Article Summary">
+        <div class="gallery-caption">
+          <h4>Grounded Article Reading</h4>
+          <p>Readability extraction with key takeaways and grounded follow-up chat.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="screenshots/youtube-summary.svg" alt="YouTube Summary">
+        <div class="gallery-caption">
+          <h4>YouTube Video Chapters &amp; Seeking</h4>
+          <p>Native multimodal video understanding with interactive seek timestamps.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="screenshots/chat-and-context.svg" alt="Chat &amp; Context Menu">
+        <div class="gallery-caption">
+          <h4>Context Menu &amp; Bilingual Chat</h4>
+          <p>Right-click selection actions (Explain, Translate, Draft) with Hinglish output.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="screenshots/numbered-action-map.svg" alt="Numbered Action Map">
+        <div class="gallery-caption">
+          <h4>Numbered Interactive Action Map</h4>
+          <p>High-contrast visual badges over buttons, inputs, links, and dropdowns.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="screenshots/proposal-card.svg" alt="Action Proposal Cards">
+        <div class="gallery-caption">
+          <h4>Action Proposals &amp; Double Confirmation</h4>
+          <p>Step approval with rationale, dry-run simulation mode, and kill switch.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="screenshots/settings-and-profile.svg" alt="Settings &amp; Profile">
+        <div class="gallery-caption">
+          <h4>Local Memory &amp; Secret Isolation</h4>
+          <p>API keys and user profile stored strictly in chrome.storage.local.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Install Guide -->
+  <section class="install-section" id="install">
+    <div class="install-inner">
+      <h2 class="section-title" style="text-align: left;">Quick Installation (Under 2 Minutes)</h2>
+      <p style="color: var(--ink-muted); margin-bottom: 24px;">Works on Google Chrome, Microsoft Edge, Brave, and other Chromium-based browsers.</p>
+
+      <div class="steps-list">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-body">
+            <h4>Download or Build the Extension</h4>
+            <p>Download the pre-packaged <code>sahayak-extension.zip</code> from <a href="https://github.com/sahayak-ai/sahayak/releases" target="_blank">Releases</a> and extract it, or clone and build from source:</p>
+            <div class="code-block">git clone https://github.com/sahayak-ai/sahayak.git
+cd sahayak
+npm install
+npm run build</div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-body">
+            <h4>Load Unpacked in Your Browser</h4>
+            <p>Open <code>chrome://extensions</code> or <code>edge://extensions</code> in your URL bar. Enable <strong>Developer mode</strong> in the top-right corner, click <strong>Load unpacked</strong>, and select the <code>dist/</code> folder.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-body">
+            <h4>Enter Your Gemini API Key</h4>
+            <p>Click the Sahayak extension icon to open the side panel. Head to the <strong>Settings</strong> tab and paste your free <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio Gemini API Key</a>. (Keys are stored only inside your browser's private local storage).</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-body">
+            <h4>Test on Local Practice Errands</h4>
+            <p>Sahayak includes built-in practice pages designed to test the agent loop safely on your own machine:</p>
+            <div class="code-block">npm run serve:practice</div>
+            <p style="margin-top: 8px;">Navigate to <code>http://127.0.0.1:3000/form.html</code> and watch Sahayak propose and fill form steps with your approval!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div>
+      <strong>Sahayak (सहायक)</strong> • Open Source AI Agent
+    </div>
+    <div>
+      <a href="https://github.com/sahayak-ai/sahayak" target="_blank" rel="noopener">GitHub</a> • 
+      <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Get Gemini Key</a> • 
+      <a href="#simulator">Try Demo</a>
+    </div>
+  </footer>
+
+  <!-- Interactive Simulator Script -->
+  <script>
+    let currentStep = 1;
+    let currentLang = 'en';
+
+    const steps = [
+      {
+        num: "Step 1 of 4",
+        type: "TYPE",
+        target: 'Type "John Doe" on [1] input "Full Name"',
+        reasonEn: '"Auto-populate applicant name using verified local profile memory."',
+        reasonHi: '"Applicant ka naam profile memory se Full Name field me type kiya."',
+        fieldId: 'sim-field-1',
+        inputId: 'sim-input-name',
+        inputValue: 'John Doe',
+        isConsequential: false,
+        btnText: '✓ Approve Step 1'
+      },
+      {
+        num: "Step 2 of 4",
+        type: "TYPE",
+        target: 'Type "john.doe@university.edu" on [2] input "Email Address"',
+        reasonEn: '"Fill contact email address from user profile data."',
+        reasonHi: '"Contact email address ko user profile se fill kiya."',
+        fieldId: 'sim-field-2',
+        inputId: 'sim-input-email',
+        inputValue: 'john.doe@university.edu',
+        isConsequential: false,
+        btnText: '✓ Approve Step 2'
+      },
+      {
+        num: "Step 3 of 4",
+        type: "SELECT",
+        target: 'Select "Full Stack AI Systems" on [3] dropdown',
+        reasonEn: '"Select matching project track specified in user goal."',
+        reasonHi: '"User goal ke mutabiq Full Stack AI Systems track select kiya."',
+        fieldId: 'sim-field-3',
+        inputId: 'sim-input-track',
+        inputValue: 'Full Stack AI Systems',
+        isConsequential: false,
+        btnText: '✓ Approve Step 3'
+      },
+      {
+        num: "Step 4 of 4",
+        type: "CLICK",
+        target: 'Click [4] button "Submit Application"',
+        reasonEn: '"Final application submission after all required fields populated."',
+        reasonHi: '"Sabhi fields bharne ke baad application final submit kar rahe hain."',
+        fieldId: 'sim-field-4',
+        inputId: 'sim-submit-btn',
+        isConsequential: true,
+        btnText: '⚠️ Confirm & Execute (Click)'
+      }
+    ];
+
+    function updateStepUI() {
+      const step = steps[currentStep - 1];
+      document.getElementById('sim-step-num').textContent = step.num;
+      document.getElementById('sim-step-type').textContent = step.type;
+      document.getElementById('sim-step-target').textContent = step.target;
+      document.getElementById('sim-step-reason').textContent = currentLang === 'hi' ? step.reasonHi : step.reasonEn;
+      
+      const banner = document.getElementById('sim-consequential-banner');
+      const approveBtn = document.getElementById('sim-approve-btn');
+      const card = document.getElementById('sim-proposal-card');
+
+      if (step.isConsequential) {
+        banner.style.display = 'block';
+        approveBtn.className = 'sim-btn-approve danger';
+        approveBtn.textContent = step.btnText;
+        card.className = 'proposal-box consequential';
+      } else {
+        banner.style.display = 'none';
+        approveBtn.className = 'sim-btn-approve';
+        approveBtn.textContent = step.btnText;
+        card.className = 'proposal-box';
+      }
+
+      // Highlight active field
+      document.querySelectorAll('.form-group').forEach(el => el.classList.remove('focused'));
+      if (step.fieldId) {
+        document.getElementById(step.fieldId)?.classList.add('focused');
+      }
+    }
+
+    function advanceSimStep() {
+      const step = steps[currentStep - 1];
+      if (step.inputId) {
+        const el = document.getElementById(step.inputId);
+        if (el && step.inputValue) el.value = step.inputValue;
+        if (step.isConsequential) {
+          alert('🎉 Simulated Goal Completed! In real Sahayak, the form is submitted only after this double confirmation.');
+          // Reset
+          currentStep = 1;
+          document.getElementById('sim-input-name').value = '';
+          document.getElementById('sim-input-email').value = '';
+          updateStepUI();
+          return;
+        }
+      }
+
+      currentStep++;
+      if (currentStep > steps.length) {
+        currentStep = 1;
+      }
+      updateStepUI();
+    }
+
+    function skipSimStep() {
+      currentStep++;
+      if (currentStep > steps.length) currentStep = 1;
+      updateStepUI();
+    }
+
+    function setSimLang(lang) {
+      currentLang = lang;
+      document.getElementById('btn-lang-en').className = lang === 'en' ? 'sim-lang-btn active' : 'sim-lang-btn';
+      document.getElementById('btn-lang-hi').className = lang === 'hi' ? 'sim-lang-btn active' : 'sim-lang-btn';
+      updateStepUI();
+    }
+
+    function showSimTab(tab) {
+      const content = document.getElementById('sim-panel-content');
+      document.querySelectorAll('.sim-tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (tab === 'summary') {
+        content.innerHTML = `
+          <div style="padding: 10px; background: #ccfbf1; border-radius: 6px; font-size: 0.8rem; font-weight: 700; color: #0f766e; margin-bottom: 12px;">
+            📄 Grounded in current page
+          </div>
+          <div style="font-size: 0.85rem; line-height: 1.5; color: #334155;">
+            <strong>Internship Summary:</strong>
+            <ul style="margin-left: 18px; margin-top: 6px;">
+              <li>3-month paid summer research fellowship.</li>
+              <li>Requires Full Stack AI Systems experience.</li>
+              <li>Deadline: Rolling review until filled.</li>
+            </ul>
+          </div>
+        `;
+      } else if (tab === 'chat') {
+        content.innerHTML = `
+          <div style="font-size: 0.82rem; margin-bottom: 10px; color: #0f766e; font-weight: 700;">
+            💬 Grounded Chat
+          </div>
+          <div style="background: #0f766e; color: #fff; padding: 6px 10px; border-radius: 8px; font-size: 0.82rem; margin-bottom: 8px; margin-left: 20px;">
+            What is the fellowship duration?
+          </div>
+          <div style="background: #f1f5f9; padding: 8px 10px; border-radius: 8px; font-size: 0.82rem; color: #1e293b;">
+            According to this page, the internship duration is <strong>3 months</strong> for the summer term.
+          </div>
+        `;
+      } else if (tab === 'settings') {
+        content.innerHTML = `
+          <div style="font-size: 0.85rem; font-weight: 700; color: #0f766e; margin-bottom: 10px;">
+            ⚙️ Settings & Privacy
+          </div>
+          <div style="font-size: 0.8rem; color: #475569;">
+            <p><strong>Gemini API Key:</strong> AIzaSyB*****************</p>
+            <p style="margin-top: 6px;"><strong>Storage:</strong> chrome.storage.local (Never committed)</p>
+            <p style="margin-top: 6px;"><strong>Denylist:</strong> Banking, checkout & payment sites blocked.</p>
+          </div>
+        `;
+      } else {
+        location.reload();
+      }
+    }
+
+    // Initialize
+    updateStepUI();
+  </script>
+</body>
+</html>

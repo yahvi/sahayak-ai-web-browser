@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%" style="background:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+  <defs>
+    <filter id="shadow4" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Browser Frame -->
+  <rect x="20" y="20" width="760" height="460" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1.5" filter="url(#shadow4)"/>
+  
+  <!-- Browser Header Bar -->
+  <rect x="20" y="20" width="760" height="40" rx="12" fill="#1e293b"/>
+  <circle cx="44" cy="40" r="5" fill="#ef4444"/>
+  <circle cx="60" cy="40" r="5" fill="#f59e0b"/>
+  <circle cx="76" cy="40" r="5" fill="#10b981"/>
+  <rect x="110" y="28" width="400" height="24" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+  <text x="125" y="44" fill="#94a3b8" font-size="11">http://127.0.0.1:3000/form.html (Practice Errand: Internship)</text>
+
+  <!-- Practice Webpage with Numbered Badges (Left) -->
+  <rect x="35" y="75" width="415" height="385" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  
+  <text x="55" y="110" fill="#0f172a" font-size="16" font-weight="700">Campus Internship Application</text>
+  <text x="55" y="128" fill="#64748b" font-size="10.5">Fill out your details to submit your project candidacy.</text>
+
+  <!-- Input Field 1: Name -->
+  <text x="55" y="160" fill="#334155" font-size="11" font-weight="600">Full Name</text>
+  <rect x="55" y="168" width="375" height="32" rx="4" fill="#f8fafc" stroke="#0f766e" stroke-width="2"/>
+  <text x="65" y="188" fill="#0f172a" font-size="11">John Doe</text>
+  <!-- Number Badge 1 -->
+  <rect x="42" y="156" width="22" height="18" rx="4" fill="#0f766e"/>
+  <text x="49" y="169" fill="#ffffff" font-size="10" font-weight="700">1</text>
+
+  <!-- Input Field 2: Email -->
+  <text x="55" y="224" fill="#334155" font-size="11" font-weight="600">Email Address</text>
+  <rect x="55" y="232" width="375" height="32" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="65" y="252" fill="#0f172a" font-size="11">john.doe@university.edu</text>
+  <!-- Number Badge 2 -->
+  <rect x="42" y="220" width="22" height="18" rx="4" fill="#0f766e"/>
+  <text x="49" y="233" fill="#ffffff" font-size="10" font-weight="700">2</text>
+
+  <!-- Input Field 3: Track Dropdown -->
+  <text x="55" y="288" fill="#334155" font-size="11" font-weight="600">Engineering Track</text>
+  <rect x="55" y="296" width="375" height="32" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="65" y="316" fill="#0f172a" font-size="11">Full Stack AI Systems ▾</text>
+  <!-- Number Badge 3 -->
+  <rect x="42" y="284" width="22" height="18" rx="4" fill="#0f766e"/>
+  <text x="49" y="297" fill="#ffffff" font-size="10" font-weight="700">3</text>
+
+  <!-- Button Field 4: Submit Application -->
+  <rect x="55" y="350" width="160" height="36" rx="6" fill="#0f766e"/>
+  <text x="80" y="372" fill="#ffffff" font-size="12" font-weight="600">Submit Application</text>
+  <!-- Number Badge 4 -->
+  <rect x="42" y="340" width="22" height="18" rx="4" fill="#b91c1c"/>
+  <text x="49" y="353" fill="#ffffff" font-size="10" font-weight="700">4</text>
+
+  <!-- Sahayak Side Panel Act Tab (Right) -->
+  <rect x="465" y="75" width="300" height="385" rx="8" fill="#fffdf9" stroke="#e2e8f0" stroke-width="1.5"/>
+  
+  <!-- Panel Top Bar -->
+  <rect x="465" y="75" width="300" height="42" rx="8" fill="#f6f3ee"/>
+  <text x="480" y="101" fill="#1c1917" font-size="15" font-weight="800">Sahayak Act</text>
+  
+  <!-- Allowlisted Host Badge -->
+  <rect x="655" y="86" width="95" height="20" rx="10" fill="#ccfbf1"/>
+  <text x="665" y="100" fill="#0f766e" font-size="9.5" font-weight="700">✓ Allowlisted</text>
+
+  <!-- Scanner Summary Section -->
+  <rect x="475" y="125" width="280" height="26" rx="4" fill="#f1f5f9"/>
+  <text x="485" y="142" fill="#334155" font-size="10.5" font-weight="600">Scanned 4 Interactive Elements on page</text>
+
+  <!-- Element List Card -->
+  <rect x="475" y="160" width="280" height="240" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  
+  <!-- Item 1 -->
+  <g transform="translate(485, 175)">
+    <rect x="0" y="0" width="20" height="18" rx="3" fill="#0f766e"/>
+    <text x="6" y="13" fill="#ffffff" font-size="10" font-weight="700">1</text>
+    <text x="28" y="13" fill="#0f172a" font-size="10.5" font-weight="600">input <tspan fill="#64748b">"Full Name"</tspan></text>
+  </g>
+
+  <!-- Item 2 -->
+  <g transform="translate(485, 215)">
+    <rect x="0" y="0" width="20" height="18" rx="3" fill="#0f766e"/>
+    <text x="6" y="13" fill="#ffffff" font-size="10" font-weight="700">2</text>
+    <text x="28" y="13" fill="#0f172a" font-size="10.5" font-weight="600">input <tspan fill="#64748b">"Email Address"</tspan></text>
+  </g>
+
+  <!-- Item 3 -->
+  <g transform="translate(485, 255)">
+    <rect x="0" y="0" width="20" height="18" rx="3" fill="#0f766e"/>
+    <text x="6" y="13" fill="#ffffff" font-size="10" font-weight="700">3</text>
+    <text x="28" y="13" fill="#0f172a" font-size="10.5" font-weight="600">select <tspan fill="#64748b">"Engineering Track"</tspan></text>
+  </g>
+
+  <!-- Item 4 (Consequential) -->
+  <g transform="translate(485, 295)">
+    <rect x="0" y="0" width="20" height="18" rx="3" fill="#b91c1c"/>
+    <text x="6" y="13" fill="#ffffff" font-size="10" font-weight="700">4</text>
+    <text x="28" y="13" fill="#b91c1c" font-size="10.5" font-weight="700">button <tspan fill="#b91c1c">"Submit Application" ⚠️</tspan></text>
+  </g>
+
+  <rect x="485" y="335" width="260" height="50" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.8"/>
+  <text x="495" y="353" fill="#0f766e" font-size="10" font-weight="700">Natural-Language Find-it:</text>
+  <text x="495" y="370" fill="#64748b" font-size="9.5">"where do I select track" → Highlights [3]</text>
+
+  <!-- Bottom Run Agent Button -->
+  <rect x="475" y="410" width="280" height="34" rx="6" fill="#0f766e"/>
+  <text x="545" y="431" fill="#ffffff" font-size="11" font-weight="700">🤖 Run Autonomous Agent</text>
+</svg>
+

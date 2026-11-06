@@ -1,0 +1,33 @@
+{
+  "name": "sahayak",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Chrome side-panel AI agent that reads the page and acts only after you approve",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "pack": "node scripts/pack-release.mjs",
+    "zip": "npm run build && node scripts/pack-release.mjs",
+    "serve:practice": "npx --yes serve practice -l 3000",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "@types/mozilla__readability": "^0.4.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0",
+    "@types/chrome": "^0.0.320",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.3",
+    "vitest": "^3.1.2"
+  }
+}

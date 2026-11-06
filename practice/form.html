@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sahayak Practice — Internship Application Form</title>
+  <style>
+    :root {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      color: #1e293b;
+      background-color: #f8fafc;
+    }
+    body {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 24px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      color: #0f172a;
+    }
+    p.desc {
+      color: #64748b;
+      margin-top: 0;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.92rem;
+      box-sizing: border-box;
+      background: #fff;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid #0f766e;
+      border-color: #0f766e;
+    }
+    .checkbox-group {
+      display: flex;
+      gap: 16px;
+      margin-top: 4px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+    }
+    button[type="submit"] {
+      background: #0f766e;
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    button[type="submit"]:hover {
+      background: #115e59;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 16px;
+      color: #0f766e;
+      text-decoration: none;
+      font-size: 0.88rem;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Internship Application</h1>
+  <p class="desc">Practice page for Sahayak element scanning, badging, and agent errands.</p>
+
+  <form id="internship-form" onsubmit="event.preventDefault(); alert('Application submitted successfully!');">
+    <div class="form-group">
+      <label for="applicant-name">Full Name</label>
+      <input type="text" id="applicant-name" name="name" placeholder="Priya Sharma" required />
+    </div>
+
+    <div class="form-group">
+      <label for="applicant-email">Email Address</label>
+      <input type="email" id="applicant-email" name="email" placeholder="priya@college.edu" required />
+    </div>
+
+    <div class="form-group">
+      <label for="applicant-college">College / University</label>
+      <select id="applicant-college" name="college" required>
+        <option value="">Select your college...</option>
+        <option value="iit_delhi">IIT Delhi</option>
+        <option value="iit_bombay">IIT Bombay</option>
+        <option value="bits_pilani">BITS Pilani</option>
+        <option value="iiit_hyderabad">IIIT Hyderabad</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Key Skills</label>
+      <div class="checkbox-group">
+        <label class="checkbox-item">
+          <input type="checkbox" id="skill-python" name="skills" value="python" /> Python
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="skill-react" name="skills" value="react" /> React
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="skill-ai" name="skills" value="ai" /> AI / ML
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="applicant-resume">Upload Resume</label>
+      <input type="file" id="applicant-resume" name="resume" aria-label="Upload resume" />
+    </div>
+
+    <div class="form-group">
+      <label for="applicant-sop">Statement of Purpose</label>
+      <textarea id="applicant-sop" name="sop" rows="3" placeholder="Explain your experience and why you are interested..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="applicant-password">Portal Password (Protected Field)</label>
+      <input type="password" id="applicant-password" name="password" placeholder="Create a password" />
+    </div>
+
+    <button type="submit" id="submit-application">Submit Application</button>
+  </form>
+
+  <a href="index.html" class="back-link">← Back to Practice Pages</a>
+</body>
+</html>
+
